@@ -1,8 +1,8 @@
 /**
  * Meshtastic Node Card
- * @version 1.3.0
+ * @version 1.3.1
  * @description A custom card for Home Assistant to display Meshtastic node information
- * @features Theme support, gateway device support, battery monitoring, signal strength, hardware info
+ * @features Theme support, gateway device support, preview support, battery monitoring, signal strength, hardware info
  * @author Your Name
  * @license MIT
  */
@@ -21,6 +21,20 @@ class MeshtasticNodeCard extends HTMLElement {
     }
 
     const entityId = this.config.entity;
+    
+    // Show preview placeholder if no entity configured
+    if (!entityId) {
+      this.content.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: var(--secondary-text-color);">
+          <div style="font-size: 48px; margin-bottom: 16px;">📡</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-text-color);">Meshtastic Node Card</div>
+          <div style="font-size: 14px;">Display Meshtastic node information with battery, signal, and hardware details</div>
+          <div style="margin-top: 16px; font-size: 12px; opacity: 0.7;">Select an entity to configure</div>
+        </div>
+      `;
+      return;
+    }
+    
     const entity = hass.states[entityId];
     
     if (!entity) {
@@ -249,9 +263,7 @@ class MeshtasticNodeCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (!config.entity) {
-      throw new Error('You need to define a Meshtastic entity');
-    }
+    // Allow empty entity for preview mode
     this.config = config;
   }
 
@@ -435,7 +447,7 @@ window.customCards.push({
 });
 
 console.info(
-  '%c MESHTASTIC-NODE-CARD %c v1.3.0 ',
+  '%c MESHTASTIC-NODE-CARD %c v1.3.1 ',
   'color: white; background: #667eea; font-weight: 700;',
   'color: #667eea; background: white; font-weight: 700;'
 );
