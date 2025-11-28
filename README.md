@@ -12,6 +12,7 @@
 ## Screenshots
 
 ![Meshtastic Node Card Example](docs/ui_example.png)
+![Meshtastic Node Card Config Example](docs/ui_config_example.png)
 
 *Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
 
