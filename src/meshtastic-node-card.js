@@ -9,6 +9,9 @@
 
 class MeshtasticNodeCard extends HTMLElement {
   set hass(hass) {
+    // Store hass for later use
+    this._hass = hass;
+    
     if (!this.content) {
       const card = document.createElement('ha-card');
       card.style.cssText = `
@@ -264,7 +267,16 @@ class MeshtasticNodeCard extends HTMLElement {
 
   setConfig(config) {
     // Allow empty entity for preview mode
+    const oldConfig = this.config;
     this.config = config;
+    
+    // Trigger re-render if config changed and hass is set (for live preview)
+    if (this._hass && oldConfig?.entity !== config?.entity) {
+      // Re-render the card with new config by calling hass setter
+      const tempHass = this._hass;
+      this._hass = null;
+      this.hass = tempHass;
+    }
   }
 
   getCardSize() {
