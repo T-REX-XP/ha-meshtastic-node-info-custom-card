@@ -276,9 +276,11 @@ class MeshtasticNodeCard extends HTMLElement {
   }
 
   setConfig(config) {
-    // Allow empty entity for preview mode
-    const oldConfig = this.config;
-    this.config = config;
+    // Store the old config before updating
+    const oldConfig = this.config || {};
+    
+    // Set the new config (allow empty entity for preview mode)
+    this.config = config || {};
     
     console.log('setConfig called:', config, 'oldConfig:', oldConfig);
     
@@ -415,11 +417,11 @@ class MeshtasticNodeCardEditor extends HTMLElement {
           <label for="entity">Entity (Required)</label>
           <ha-entity-picker
             id="entity"
-            .hass="${this._hass}"
-            .value="${this._config.entity || ''}"
-            .configValue="${'entity'}"
-            @value-changed="${this._valueChanged}"
-            .includeDomains="${['meshtastic']}"
+            .hass=${this._hass}
+            .value=${this._config.entity || ''}
+            .configValue=${'entity'}
+            @value-changed=${this._valueChanged}
+            .includeDomains=${['meshtastic']}
             allow-custom-entity
           ></ha-entity-picker>
         </div>
