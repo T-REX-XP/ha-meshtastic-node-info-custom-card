@@ -23,10 +23,18 @@ class MeshtasticNodeCard extends HTMLElement {
       this.appendChild(card);
     }
 
+    // Ensure config exists
+    if (!this.config) {
+      this.config = {};
+    }
+
     const entityId = this.config.entity;
+    
+    console.log('Rendering card with entityId:', entityId, 'hass.states:', Object.keys(hass.states || {}).length);
     
     // Show preview placeholder if no entity configured
     if (!entityId) {
+      console.log('No entity configured, showing placeholder');
       this.content.innerHTML = `
         <div style="text-align: center; padding: 40px 20px; color: var(--secondary-text-color);">
           <div style="font-size: 48px; margin-bottom: 16px;">📡</div>
@@ -39,6 +47,8 @@ class MeshtasticNodeCard extends HTMLElement {
     }
     
     const entity = hass.states[entityId];
+    
+    console.log('Entity lookup result:', entity ? 'found' : 'not found', entityId);
     
     if (!entity) {
       this.content.innerHTML = `<div style="color: var(--error-color);">Entity ${entityId} not found</div>`;
@@ -270,8 +280,11 @@ class MeshtasticNodeCard extends HTMLElement {
     const oldConfig = this.config;
     this.config = config;
     
+    console.log('setConfig called:', config, 'oldConfig:', oldConfig);
+    
     // Trigger re-render if config changed and hass is set (for live preview)
-    if (this._hass && oldConfig?.entity !== config?.entity) {
+    if (this._hass) {
+      console.log('Re-rendering with entity:', config?.entity);
       // Re-render the card with new config by calling hass setter
       const tempHass = this._hass;
       this._hass = null;
@@ -406,12 +419,12 @@ class MeshtasticNodeCardEditor extends HTMLElement {
             .value="${this._config.entity || ''}"
             .configValue="${'entity'}"
             @value-changed="${this._valueChanged}"
-            .includeDomains="${['sensor', 'meshtastic']}"
+            .includeDomains="${['meshtastic']}"
             allow-custom-entity
           ></ha-entity-picker>
         </div>
         <div class="help-text">
-          Select a Meshtastic entity (e.g., meshtastic.gateway_470c or sensor.meshtastic_node_alphanode_1)
+          Select a Meshtastic entity (e.g., meshtastic.gateway_470c)
         </div>
       </div>
     `;
