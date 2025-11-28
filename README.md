@@ -5,6 +5,7 @@
   
   [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
   [![GitHub Release](https://img.shields.io/github/release/T-REX-XP/ha-meshtastic-node-info-custom-card.svg)](https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card/releases)
+  [![Validate](https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card/actions/workflows/validate.yml)
   
   A custom card for Home Assistant to display Meshtastic node information with a beautiful, modern UI.
 </div>

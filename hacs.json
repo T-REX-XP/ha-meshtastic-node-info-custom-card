@@ -1,7 +1,9 @@
 {
-  "name": "Meshtastic Node Card",
+  "name": "Meshtastic Node Info Card",
+  "country": "UA",
   "content_in_root": true,
   "filename": "meshtastic-node-card.js",
   "render_readme": true,
-  "homeassistant": "2023.1.0"
+  "homeassistant": "2025.1.0",
+  "zip_release": false
 }
