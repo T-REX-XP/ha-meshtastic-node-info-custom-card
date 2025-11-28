@@ -14,14 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Create release zip
-        run: |
-          cd ${{ github.workspace }}
-          zip meshtastic-node-card.zip src/meshtastic-node-card.js
+      # - name: Create release zip
+      #   run: |
+      #     cd ${{ github.workspace }}
+      #     zip meshtastic-node-card.zip src/meshtastic-node-card.js
           
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
         with:
-          files: meshtastic-node-card.zip
+          # files: meshtastic-node-card.zip
+          files: src/meshtastic-node-card.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
