@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="icon.svg" alt="Meshtastic Node Card" width="120" height="120">
+  <img src="icon.png" alt="Meshtastic Node Card" width="120" height="120">
   
   # Meshtastic Node Card for Home Assistant
   
