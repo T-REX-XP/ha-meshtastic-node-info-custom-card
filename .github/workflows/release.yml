@@ -4,12 +4,15 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Prepare release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Create release zip
         run: |
@@ -17,11 +20,8 @@ jobs:
           zip meshtastic-node-card.zip src/meshtastic-node-card.js
           
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          files: meshtastic-node-card.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./meshtastic-node-card.zip
-          asset_name: meshtastic-node-card.zip
-          asset_content_type: application/zip
