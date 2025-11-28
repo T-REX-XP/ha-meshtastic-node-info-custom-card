@@ -1,12 +1,63 @@
 /**
  * Meshtastic Node Card
- * v2.0.0
+ * v2.1.0
  *
  * - Full/compact layouts
  * - Toggles: battery, signal, SNR, details
  * - Robust config handling
  * - Meshtastic-only entity picker in editor
+ * - Localization support (English, Ukrainian)
  */
+
+// Localization strings
+const TRANSLATIONS = {
+  en: {
+    battery: "Battery",
+    signal: "Signal",
+    snr: "SNR",
+    lastSeen: "Last Seen",
+    hardware: "HW:",
+    location: "Loc:",
+    config: "Config:",
+    counts: "Counts:",
+    justNow: "Just now",
+    minutesAgo: "{0}m ago",
+    hoursAgo: "{0}h ago",
+    daysAgo: "{0}d ago",
+    unknown: "Unknown",
+    unknownNode: "Unknown Node",
+    entityNotFound: 'Entity "{0}" not found',
+    cardTitle: "Meshtastic Node Card",
+    cardDescription: "Display Meshtastic node information with battery, signal, and hardware details.",
+    selectEntity: "Select a Meshtastic entity in the card configuration.",
+    gpsEnabled: "GPS Enabled",
+    gpsDisabled: "GPS Disabled",
+    gpsAvailable: "GPS Available",
+  },
+  uk: {
+    battery: "Батарея",
+    signal: "Сигнал",
+    snr: "SNR",
+    lastSeen: "Востаннє",
+    hardware: "Обл:",
+    location: "Місце:",
+    config: "Конфіг:",
+    counts: "Лічильники:",
+    justNow: "Щойно",
+    minutesAgo: "{0}хв тому",
+    hoursAgo: "{0}год тому",
+    daysAgo: "{0}дн тому",
+    unknown: "Невідомо",
+    unknownNode: "Невідомий вузол",
+    entityNotFound: 'Об\'єкт "{0}" не знайдено',
+    cardTitle: "Картка вузла Meshtastic",
+    cardDescription: "Відображення інформації про вузол Meshtastic з батареєю, сигналом та деталями обладнання.",
+    selectEntity: "Виберіть об'єкт Meshtastic у конфігурації картки.",
+    gpsEnabled: "GPS увімкнено",
+    gpsDisabled: "GPS вимкнено",
+    gpsAvailable: "GPS доступний",
+  },
+};
 
 class MeshtasticNodeCard extends HTMLElement {
   constructor() {
@@ -15,6 +66,29 @@ class MeshtasticNodeCard extends HTMLElement {
     this._config = null;
     this._card = null;
     this._content = null;
+    this._lang = "en";
+  }
+
+  // Get current language from Home Assistant
+  _getLanguage() {
+    if (!this._hass) return "en";
+    const lang = this._hass.language || "en";
+    // Return 'uk' for Ukrainian, 'en' for everything else
+    return lang.startsWith("uk") ? "uk" : "en";
+  }
+
+  // Translate a key with optional parameters
+  _t(key, ...params) {
+    this._lang = this._getLanguage();
+    const translations = TRANSLATIONS[this._lang] || TRANSLATIONS.en;
+    let text = translations[key] || TRANSLATIONS.en[key] || key;
+    
+    // Replace {0}, {1}, etc. with parameters
+    params.forEach((param, index) => {
+      text = text.replace(`{${index}}`, param);
+    });
+    
+    return text;
   }
 
   // Default configuration
@@ -84,7 +158,7 @@ class MeshtasticNodeCard extends HTMLElement {
     const entity = this._hass.states[entityId];
     if (!entity) {
       this._content.innerHTML = this._renderError(
-        `Entity "${entityId}" not found`
+        this._t("entityNotFound", entityId)
       );
       return;
     }
@@ -100,13 +174,13 @@ class MeshtasticNodeCard extends HTMLElement {
       <div style="text-align:center; padding:40px 20px; color:var(--secondary-text-color);">
         <div style="font-size:48px; margin-bottom:16px;">📡</div>
         <div style="font-size:18px; font-weight:600; margin-bottom:8px; color:var(--primary-text-color);">
-          Meshtastic Node Card
+          ${this._t("cardTitle")}
         </div>
         <div style="font-size:14px;">
-          Display Meshtastic node information with battery, signal, and hardware details.
+          ${this._t("cardDescription")}
         </div>
         <div style="margin-top:16px; font-size:12px; opacity:0.7;">
-          Select a Meshtastic entity in the card configuration.
+          ${this._t("selectEntity")}
         </div>
       </div>
     `;
@@ -282,7 +356,7 @@ class MeshtasticNodeCard extends HTMLElement {
   _renderBatteryStat(data) {
     return `
       <div class="stat-item">
-        <div class="stat-label">Battery</div>
+        <div class="stat-label">${this._t("battery")}</div>
         <div class="stat-value">
           <span style="color:${data.batteryColor}; font-size:20px;">
             ${data.batteryIcon}
@@ -298,7 +372,7 @@ class MeshtasticNodeCard extends HTMLElement {
   _renderSignalStat(data) {
     return `
       <div class="stat-item">
-        <div class="stat-label">Signal</div>
+        <div class="stat-label">${this._t("signal")}</div>
         <div class="stat-value">
           <div class="signal-bars">${data.signalBars}</div>
           <span>${data.signal} dBm</span>
@@ -310,7 +384,7 @@ class MeshtasticNodeCard extends HTMLElement {
   _renderSnrStat(data) {
     return `
       <div class="stat-item">
-        <div class="stat-label">SNR</div>
+        <div class="stat-label">${this._t("snr")}</div>
         <div class="stat-value">
           <span style="color:#00ff88;">${data.snr} dB</span>
         </div>
@@ -321,7 +395,7 @@ class MeshtasticNodeCard extends HTMLElement {
   _renderLastSeenStat(data) {
     return `
       <div class="stat-item">
-        <div class="stat-label">Last Seen</div>
+        <div class="stat-label">${this._t("lastSeen")}</div>
         <div class="stat-value">
           <span>${data.lastSeen}</span>
         </div>
@@ -333,15 +407,15 @@ class MeshtasticNodeCard extends HTMLElement {
     return `
       <div class="details-section">
         <div class="detail-row">
-          <span class="detail-label">HW:</span>
+          <span class="detail-label">${this._t("hardware")}</span>
           <span class="detail-value">${data.hardware}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Loc:</span>
+          <span class="detail-label">${this._t("location")}</span>
           <span class="detail-value">${data.location}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">${data.isGateway ? "Config:" : "Counts:"}</span>
+          <span class="detail-label">${data.isGateway ? this._t("config") : this._t("counts")}</span>
           <span class="detail-value">
             ${
               data.isGateway
@@ -364,13 +438,13 @@ class MeshtasticNodeCard extends HTMLElement {
       attrs.friendly_name ||
       attrs.long_name ||
       attrs.short_name ||
-      "Unknown Node";
+      this._t("unknownNode");
 
     const nodeId =
       attrs.node_id ||
       entity.entity_id.split(".")[1] ||
       entity.state ||
-      "unknown";
+      this._t("unknown").toLowerCase();
 
     const rawBattery = Number(attrs.battery_level ?? 0);
     const battery = isNaN(rawBattery) ? 0 : rawBattery;
@@ -392,18 +466,18 @@ class MeshtasticNodeCard extends HTMLElement {
     const lastSeen = this.formatLastSeen(lastSeenRaw);
 
     const hardware = isGateway
-      ? `${attrs.config_lora_region || "Unknown"} / ${
-          attrs.config_lora_modemPreset || "Unknown"
+      ? `${attrs.config_lora_region || this._t("unknown")} / ${
+          attrs.config_lora_modemPreset || this._t("unknown")
         }`
-      : attrs.hardware || "Unknown";
+      : attrs.hardware || this._t("unknown");
 
     const location = isGateway
       ? attrs.config_position_gpsEnabled
-        ? "GPS Enabled"
-        : "GPS Disabled"
+        ? this._t("gpsEnabled")
+        : this._t("gpsDisabled")
       : attrs.position_precision_bits
-      ? "GPS Available"
-      : attrs.location || "Unknown";
+      ? this._t("gpsAvailable")
+      : attrs.location || this._t("unknown");
 
     const hopLimit = attrs.config_lora_hopLimit || 0;
     const txPower = attrs.config_lora_txPower || 0;
@@ -474,21 +548,21 @@ class MeshtasticNodeCard extends HTMLElement {
   }
 
   formatLastSeen(timestamp) {
-    if (!timestamp) return "Unknown";
+    if (!timestamp) return this._t("unknown");
     const now = new Date();
     const then = new Date(timestamp);
-    if (isNaN(then.getTime())) return "Unknown";
+    if (isNaN(then.getTime())) return this._t("unknown");
 
     const diffMs = now - then;
     const mins = Math.floor(diffMs / 60000);
-    if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins}m ago`;
+    if (mins < 1) return this._t("justNow");
+    if (mins < 60) return this._t("minutesAgo", mins);
 
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) return this._t("hoursAgo", hours);
 
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return this._t("daysAgo", days);
   }
 
   getCardSize() {
@@ -668,7 +742,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c MESHTASTIC-NODE-CARD %c v2.0.0",
+  "%c MESHTASTIC-NODE-CARD %c v2.1.0",
   "color:white; background:#667eea; font-weight:bold;",
   "color:#667eea; background:white; font-weight:bold;"
 );

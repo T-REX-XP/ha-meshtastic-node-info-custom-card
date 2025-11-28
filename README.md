@@ -16,7 +16,9 @@
 
 *Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
 
-> 🎉 **New in v2.0.0**: Complete rewrite with customizable layouts and toggleable metrics!
+> � **New in v2.1.0**: Localization support! Now available in English and Ukrainian.
+>
+> 🎉 **v2.0.0 Features**: Complete rewrite with customizable layouts and toggleable metrics!
 > - **Compact & Full layouts** - Choose the display density that fits your dashboard
 > - **Toggleable metrics** - Show/hide battery, signal, SNR, and details sections
 > - **Improved configuration** - Visual editor with live preview
@@ -37,6 +39,7 @@
 - 📐 **Layout Options** - Compact or full display modes
 - ⚙️ **Customizable** - Toggle individual metrics on/off
 - 🎯 **Live Preview** - See changes in real-time while configuring
+- 🌍 **Localization** - Supports English and Ukrainian languages
 
 ## Installation
 
@@ -195,6 +198,31 @@ show_signal: false
 show_snr: false
 show_details: false
 ```
+
+## Localization
+
+The card automatically detects your Home Assistant language and displays text accordingly.
+
+### Supported Languages
+
+- 🇬🇧 **English** (en) - Default
+- 🇺🇦 **Ukrainian** (uk) - Українська
+
+The card will automatically use Ukrainian translations when your Home Assistant language is set to Ukrainian. All labels, time formats, and messages are translated.
+
+### Translated Elements
+
+- Stat labels (Battery, Signal, SNR, Last Seen)
+- Detail labels (Hardware, Location, Config/Counts)
+- Time formatting (Just now, minutes/hours/days ago)
+- GPS status messages
+- Error messages
+- Placeholder text
+
+To change your Home Assistant language:
+1. Go to your profile (bottom left)
+2. Select your preferred language
+3. Refresh the page
 
 ## Support
 
