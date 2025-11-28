@@ -1,7 +1,7 @@
 {
   "name": "Meshtastic Node Card",
-  "content_in_root": false,
-  "filename": "src/meshtastic-node-card.js",
+  "content_in_root": true,
+  "filename": "meshtastic-node-card.js",
   "render_readme": true,
   "homeassistant": "2023.1.0"
 }

@@ -57,7 +57,7 @@ After installing, verify these steps:
 
 ### Manual Installation
 
-1. Copy `src/meshtastic-node-card.js` to your Home Assistant `config/www/` directory
+1. Copy `meshtastic-node-card.js` to your Home Assistant `config/www/` directory
 2. Add the resource to your dashboard:
    - Go to Settings → Dashboards → Resources
    - Click "Add Resource"
