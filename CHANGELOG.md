@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-11-28
+
+### Added
+- 🔌 **Gateway device support** - Card now works with `meshtastic.gateway_*` entities
+- Auto-detection of entity type (gateway vs node sensor)
+- Gateway-specific information display:
+  - LoRa region and modem preset (instead of hardware model)
+  - Device role, hop limit, and TX power (instead of message counts)
+  - GPS enabled/disabled status
+- Support for `device_class: gateway` attribute
+
+### Changed
+- Node name extraction now uses `friendly_name` as primary source
+- Node ID extraction improved for gateway entities
+- Hardware info adapts based on entity type
+- Location info shows GPS status for gateways
+- Counts section shows config for gateways, messages for nodes
+
+### Technical
+- Version bumped to 1.3.0
+- Added `isGateway` detection logic
+- Conditional rendering based on entity type
+- Backward compatible with existing node sensor entities
+
 ## [1.2.0] - 2025-11-28
 
 ### Added

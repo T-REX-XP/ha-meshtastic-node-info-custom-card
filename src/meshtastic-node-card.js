@@ -1,8 +1,8 @@
 /**
  * Meshtastic Node Card
- * @version 1.2.0
+ * @version 1.3.0
  * @description A custom card for Home Assistant to display Meshtastic node information
- * @features Theme support, battery monitoring, signal strength, hardware info
+ * @features Theme support, gateway device support, battery monitoring, signal strength, hardware info
  * @author Your Name
  * @license MIT
  */
@@ -29,22 +29,43 @@ class MeshtasticNodeCard extends HTMLElement {
     }
 
     const attrs = entity.attributes;
-    const nodeName = attrs.long_name || attrs.short_name || 'Unknown Node';
-    const nodeId = attrs.node_id || entity.state;
     
-    // Extract data with fallbacks
+    // Detect entity type: gateway device or node sensor
+    const isGateway = attrs.device_class === 'gateway';
+    
+    // Extract node name and ID
+    const nodeName = attrs.friendly_name || attrs.long_name || attrs.short_name || 'Unknown Node';
+    const nodeId = attrs.node_id || entity.entity_id.split('.')[1] || entity.state;
+    
+    // Extract data with fallbacks for both formats
     const battery = attrs.battery_level || 0;
     const voltage = attrs.voltage || 0;
     const signal = attrs.snr || attrs.rssi || 0;
     const snr = attrs.snr || 0;
     const lastSeen = attrs.last_heard || entity.last_changed;
-    const hardware = attrs.hardware || 'Unknown';
-    const location = attrs.position_precision_bits ? 'GPS Available' : attrs.location || 'Unknown';
-    const counts = {
-      total: attrs.message_count || 0,
-      sent: attrs.messages_sent || 0,
-      received: attrs.messages_received || 0
-    };
+    
+    // Hardware info - gateway shows config, sensors show hardware model
+    const hardware = isGateway 
+      ? `${attrs.config_lora_region || 'Unknown'} / ${attrs.config_lora_modemPreset || 'Unknown'}`
+      : (attrs.hardware || 'Unknown');
+    
+    // Location - check GPS settings for gateway
+    const location = isGateway
+      ? (attrs.config_position_gpsEnabled ? 'GPS Enabled' : 'GPS Disabled')
+      : (attrs.position_precision_bits ? 'GPS Available' : attrs.location || 'Unknown');
+    
+    // Message counts - not available for gateway, show config instead
+    const counts = isGateway
+      ? {
+          hopLimit: attrs.config_lora_hopLimit || 0,
+          txPower: attrs.config_lora_txPower || 0,
+          role: attrs.config_device_role || 'Unknown'
+        }
+      : {
+          total: attrs.message_count || 0,
+          sent: attrs.messages_sent || 0,
+          received: attrs.messages_received || 0
+        };
 
     // Format last seen
     const lastSeenTime = this.formatLastSeen(lastSeen);
@@ -215,9 +236,12 @@ class MeshtasticNodeCard extends HTMLElement {
             <span class="detail-value">${location}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-icon">💬</span>
-            <span class="detail-label">Counts:</span>
-            <span class="detail-value">${counts.total} | ↑${counts.sent} | ↓${counts.received}</span>
+            <span class="detail-icon">${isGateway ? '⚙️' : '💬'}</span>
+            <span class="detail-label">${isGateway ? 'Config:' : 'Counts:'}</span>
+            <span class="detail-value">${isGateway 
+              ? `${counts.role} | Hop:${counts.hopLimit} | TX:${counts.txPower}dBm`
+              : `${counts.total} | ↑${counts.sent} | ↓${counts.received}`
+            }</span>
           </div>
         </div>
       </div>
@@ -411,7 +435,7 @@ window.customCards.push({
 });
 
 console.info(
-  '%c MESHTASTIC-NODE-CARD %c v1.2.0 ',
+  '%c MESHTASTIC-NODE-CARD %c v1.3.0 ',
   'color: white; background: #667eea; font-weight: 700;',
   'color: #667eea; background: white; font-weight: 700;'
 );

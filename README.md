@@ -15,7 +15,9 @@
 
 *Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
 
-> 🎨 **New in v1.2.0**: Full theme support! The card now automatically adapts to your Home Assistant theme (light, dark, or custom). See [THEME_SUPPORT.md](THEME_SUPPORT.md) for details.
+> 🔌 **New in v1.3.0**: Gateway device support! Now works with `meshtastic.gateway_*` entities, showing LoRa config, device role, and GPS status.
+> 
+> 🎨 **New in v1.2.0**: Full theme support! The card automatically adapts to your Home Assistant theme (light, dark, or custom). See [THEME_SUPPORT.md](THEME_SUPPORT.md) for details.
 
 ## Features
 
@@ -26,6 +28,7 @@
 - 🔧 Hardware information
 - 📍 Location data
 - 💬 Message statistics
+- 🔌 **Gateway device support** - Works with both node sensors and gateway entities
 - 🎨 **Full Home Assistant theme support** - Adapts to light/dark/custom themes
 
 ## Installation
@@ -105,7 +108,9 @@ entity: sensor.meshtastic_node_alphanode_1
 
 ## Expected Entity Attributes
 
-The card expects the Meshtastic entity to have the following attributes:
+The card automatically detects the entity type and adapts the display accordingly.
+
+### For Node Sensors (`sensor.meshtastic_*`)
 
 - `long_name` or `short_name` - Node name
 - `node_id` - Node identifier
@@ -117,6 +122,17 @@ The card expects the Meshtastic entity to have the following attributes:
 - `hardware` - Hardware model
 - `location` or `position_precision_bits` - Location information
 - `message_count`, `messages_sent`, `messages_received` - Message statistics
+
+### For Gateway Devices (`meshtastic.gateway_*`)
+
+- `friendly_name` - Gateway name
+- `device_class: gateway` - Entity type identifier
+- `config_lora_region` - LoRa region (e.g., EU_433)
+- `config_lora_modemPreset` - Modem preset (e.g., LONG_FAST)
+- `config_device_role` - Device role (e.g., CLIENT)
+- `config_lora_hopLimit` - Hop limit setting
+- `config_lora_txPower` - TX power in dBm
+- `config_position_gpsEnabled` - GPS status
 
 ## Examples
 
