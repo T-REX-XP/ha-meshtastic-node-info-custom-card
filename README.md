@@ -16,21 +16,27 @@
 
 *Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
 
-> 🔌 **New in v1.3.0**: Gateway device support! Now works with `meshtastic.gateway_*` entities, showing LoRa config, device role, and GPS status.
-> 
-> 🎨 **New in v1.2.0**: Full theme support! The card automatically adapts to your Home Assistant theme (light, dark, or custom). See [THEME_SUPPORT.md](THEME_SUPPORT.md) for details.
+> 🎉 **New in v2.0.0**: Complete rewrite with customizable layouts and toggleable metrics!
+> - **Compact & Full layouts** - Choose the display density that fits your dashboard
+> - **Toggleable metrics** - Show/hide battery, signal, SNR, and details sections
+> - **Improved configuration** - Visual editor with live preview
+> - **Robust error handling** - Better handling of missing entities and invalid data
 
 ## Features
 
-- 📱 Node name and ID display with avatar
-- 🔋 Battery level with visual indicator
-- 📶 Signal strength (RSSI/SNR) with bars
-- ⏰ Last seen timestamp
-- 🔧 Hardware information
-- 📍 Location data
-- 💬 Message statistics
-- 🔌 **Gateway device support** - Works with both node sensors and gateway entities
-- 🎨 **Full Home Assistant theme support** - Adapts to light/dark/custom themes
+- 📱 **Node Information** - Name, ID, and avatar with initials
+- 🔋 **Battery Monitoring** - Level with visual indicator and voltage (toggleable)
+- 📶 **Signal Strength** - RSSI with visual bars (toggleable)
+- 📊 **SNR Display** - Signal-to-Noise Ratio (toggleable)
+- ⏰ **Last Seen** - Timestamp with relative time formatting
+- 🔧 **Hardware Info** - Model and configuration details (toggleable)
+- 📍 **Location Data** - GPS status and availability
+- 💬 **Message Statistics** - Total, sent, and received counts
+- 🔌 **Gateway Support** - Works with both node sensors and gateway entities
+- 🎨 **Theme Integration** - Adapts to Home Assistant themes
+- 📐 **Layout Options** - Compact or full display modes
+- ⚙️ **Customizable** - Toggle individual metrics on/off
+- 🎯 **Live Preview** - See changes in real-time while configuring
 
 ## Installation
 
@@ -50,7 +56,7 @@
 8. **Important:** Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)
 9. Restart Home Assistant
 
-**⚠️ Card not appearing?** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed help.
+**⚠️ Card not appearing?** Clear your browser cache and restart Home Assistant.
 
 #### Post-Installation Checklist
 
@@ -80,32 +86,55 @@ After installing, verify these steps:
 2. Click "Edit Dashboard" (top right)
 3. Click "+ Add Card"
 4. Search for "Meshtastic Node Card"
-5. Select your Meshtastic entity from the dropdown
-6. Click "Save"
-
-📖 **See [UI_EDITOR_GUIDE.md](UI_EDITOR_GUIDE.md) for detailed instructions with troubleshooting**
+5. Configure the card:
+   - **Entity**: Select your Meshtastic entity (only `meshtastic.*` domain entities shown)
+   - **Compact layout**: Toggle for a more condensed display
+   - **Show battery**: Display battery level and voltage
+   - **Show signal**: Display signal strength with bars
+   - **Show SNR**: Display Signal-to-Noise Ratio
+   - **Show details**: Display hardware, location, and message counts
+6. See live preview on the right as you configure
+7. Click "Save"
 
 ### Manual YAML Configuration
 
 Add the card to your dashboard with the following configuration:
 
+**Minimal configuration:**
 ```yaml
 type: custom:meshtastic-node-card
 entity: meshtastic.gateway_470c
 ```
 
-Or with a sensor entity:
-
+**Full configuration with all options:**
 ```yaml
 type: custom:meshtastic-node-card
-entity: sensor.meshtastic_node_alphanode_1
+entity: meshtastic.gateway_470c
+compact: false
+show_battery: true
+show_signal: true
+show_snr: true
+show_details: true
+```
+
+**Compact layout example:**
+```yaml
+type: custom:meshtastic-node-card
+entity: meshtastic.gateway_470c
+compact: true
+show_details: false
 ```
 
 ### Configuration Options
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `entity` | string | Yes | The Meshtastic entity ID (supports both `meshtastic.*` and `sensor.*` domains) |
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `entity` | string | Yes | - | The Meshtastic entity ID (supports `meshtastic.*` domain) |
+| `compact` | boolean | No | `false` | Use compact layout (smaller, denser display) |
+| `show_battery` | boolean | No | `true` | Show battery level and voltage |
+| `show_signal` | boolean | No | `true` | Show signal strength with bars |
+| `show_snr` | boolean | No | `true` | Show Signal-to-Noise Ratio |
+| `show_details` | boolean | No | `true` | Show hardware, location, and message counts |
 
 ## Expected Entity Attributes
 
@@ -137,16 +166,34 @@ The card automatically detects the entity type and adapts the display accordingl
 
 ## Examples
 
-**Using meshtastic domain:**
+**Full layout with all metrics (default):**
 ```yaml
 type: custom:meshtastic-node-card
 entity: meshtastic.gateway_470c
 ```
 
-**Using sensor domain:**
+**Compact layout for space-constrained dashboards:**
 ```yaml
 type: custom:meshtastic-node-card
-entity: sensor.meshtastic_alphanode_1_base
+entity: meshtastic.gateway_470c
+compact: true
+```
+
+**Minimal display - only essential info:**
+```yaml
+type: custom:meshtastic-node-card
+entity: meshtastic.gateway_470c
+show_snr: false
+show_details: false
+```
+
+**Battery-focused display:**
+```yaml
+type: custom:meshtastic-node-card
+entity: meshtastic.gateway_470c
+show_signal: false
+show_snr: false
+show_details: false
 ```
 
 ## Support
