@@ -357,11 +357,12 @@ class MeshtasticNodeCardEditor extends HTMLElement {
             .value="${this._config.entity || ''}"
             .configValue="${'entity'}"
             @value-changed="${this._valueChanged}"
+            .includeDomains="${['sensor', 'meshtastic']}"
             allow-custom-entity
           ></ha-entity-picker>
         </div>
         <div class="help-text">
-          Select a Meshtastic node entity (e.g., sensor.meshtastic_node_alphanode_1)
+          Select a Meshtastic entity (e.g., meshtastic.gateway_470c or sensor.meshtastic_node_alphanode_1)
         </div>
       </div>
     `;

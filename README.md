@@ -1,9 +1,13 @@
-# Meshtastic Node Card for Home Assistant
-
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/T-REX-XP/ha-meshtastic-node-info-custom-card.svg)](https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card/releases)
-
-A custom card for Home Assistant to display Meshtastic node information with a beautiful, modern UI.
+<div align="center">
+  <img src="icon.svg" alt="Meshtastic Node Card" width="120" height="120">
+  
+  # Meshtastic Node Card for Home Assistant
+  
+  [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+  [![GitHub Release](https://img.shields.io/github/release/T-REX-XP/ha-meshtastic-node-info-custom-card.svg)](https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card/releases)
+  
+  A custom card for Home Assistant to display Meshtastic node information with a beautiful, modern UI.
+</div>
 
 ## Screenshots
 
@@ -67,6 +71,13 @@ Add the card to your dashboard with the following configuration:
 
 ```yaml
 type: custom:meshtastic-node-card
+entity: meshtastic.gateway_470c
+```
+
+Or with a sensor entity:
+
+```yaml
+type: custom:meshtastic-node-card
 entity: sensor.meshtastic_node_alphanode_1
 ```
 
@@ -74,7 +85,7 @@ entity: sensor.meshtastic_node_alphanode_1
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `entity` | string | Yes | The Meshtastic node entity ID |
+| `entity` | string | Yes | The Meshtastic entity ID (supports both `meshtastic.*` and `sensor.*` domains) |
 
 ## Expected Entity Attributes
 
@@ -91,8 +102,15 @@ The card expects the Meshtastic entity to have the following attributes:
 - `location` or `position_precision_bits` - Location information
 - `message_count`, `messages_sent`, `messages_received` - Message statistics
 
-## Example
+## Examples
 
+**Using meshtastic domain:**
+```yaml
+type: custom:meshtastic-node-card
+entity: meshtastic.gateway_470c
+```
+
+**Using sensor domain:**
 ```yaml
 type: custom:meshtastic-node-card
 entity: sensor.meshtastic_alphanode_1_base

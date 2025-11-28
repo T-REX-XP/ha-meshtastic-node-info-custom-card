@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#1a1d2e" rx="20"/>
+  
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="meshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="signalGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00cc6a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Mesh network nodes -->
+  <circle cx="100" cy="100" r="12" fill="url(#meshGradient)" opacity="0.9"/>
+  <circle cx="60" cy="60" r="10" fill="url(#meshGradient)" opacity="0.8"/>
+  <circle cx="140" cy="60" r="10" fill="url(#meshGradient)" opacity="0.8"/>
+  <circle cx="60" cy="140" r="10" fill="url(#meshGradient)" opacity="0.8"/>
+  <circle cx="140" cy="140" r="10" fill="url(#meshGradient)" opacity="0.8"/>
+  
+  <!-- Connection lines -->
+  <line x1="100" y1="100" x2="60" y2="60" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+  <line x1="100" y1="100" x2="140" y2="60" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+  <line x1="100" y1="100" x2="60" y2="140" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+  <line x1="100" y1="100" x2="140" y2="140" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+  <line x1="60" y1="60" x2="140" y2="60" stroke="#667eea" stroke-width="2" opacity="0.3"/>
+  <line x1="60" y1="140" x2="140" y2="140" stroke="#667eea" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Signal waves from center -->
+  <circle cx="100" cy="100" r="25" fill="none" stroke="url(#signalGradient)" stroke-width="2" opacity="0.3"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="url(#signalGradient)" stroke-width="2" opacity="0.2"/>
+  <circle cx="100" cy="100" r="55" fill="none" stroke="url(#signalGradient)" stroke-width="2" opacity="0.1"/>
+  
+  <!-- Battery indicator (top right corner accent) -->
+  <rect x="155" y="25" width="20" height="12" rx="2" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.6"/>
+  <rect x="157" y="27" width="12" height="8" rx="1" fill="#00ff88" opacity="0.6"/>
+  <rect x="175" y="29" width="3" height="4" rx="1" fill="#00ff88" opacity="0.6"/>
+</svg>
