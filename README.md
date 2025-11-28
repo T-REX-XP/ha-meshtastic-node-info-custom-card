@@ -15,6 +15,8 @@
 
 *Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
 
+> 🎨 **New in v1.2.0**: Full theme support! The card now automatically adapts to your Home Assistant theme (light, dark, or custom). See [THEME_SUPPORT.md](THEME_SUPPORT.md) for details.
+
 ## Features
 
 - 📱 Node name and ID display with avatar
@@ -24,6 +26,7 @@
 - 🔧 Hardware information
 - 📍 Location data
 - 💬 Message statistics
+- 🎨 **Full Home Assistant theme support** - Adapts to light/dark/custom themes
 
 ## Installation
 

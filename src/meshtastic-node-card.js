@@ -1,7 +1,8 @@
 /**
  * Meshtastic Node Card
- * @version 1.1.0
+ * @version 1.2.0
  * @description A custom card for Home Assistant to display Meshtastic node information
+ * @features Theme support, battery monitoring, signal strength, hardware info
  * @author Your Name
  * @license MIT
  */
@@ -11,11 +12,7 @@ class MeshtasticNodeCard extends HTMLElement {
     if (!this.content) {
       const card = document.createElement('ha-card');
       card.style.cssText = `
-        background: #1a1d2e;
-        border-radius: 12px;
         padding: 16px;
-        color: #fff;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       `;
       
       this.content = document.createElement('div');
@@ -27,7 +24,7 @@ class MeshtasticNodeCard extends HTMLElement {
     const entity = hass.states[entityId];
     
     if (!entity) {
-      this.content.innerHTML = `<div style="color: #ff5555;">Entity ${entityId} not found</div>`;
+      this.content.innerHTML = `<div style="color: var(--error-color);">Entity ${entityId} not found</div>`;
       return;
     }
 
@@ -65,25 +62,27 @@ class MeshtasticNodeCard extends HTMLElement {
           display: flex;
           flex-direction: column;
           gap: 16px;
+          color: var(--primary-text-color);
+          font-family: var(--paper-font-body1_-_font-family);
         }
         .node-header {
           display: flex;
           align-items: center;
           gap: 12px;
           padding-bottom: 16px;
-          border-bottom: 1px solid #2a2d3e;
+          border-bottom: 1px solid var(--divider-color);
         }
         .node-avatar {
           width: 48px;
           height: 48px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 20px;
           font-weight: bold;
-          color: white;
+          color: var(--text-primary-color);
         }
         .node-info {
           flex: 1;
@@ -92,10 +91,11 @@ class MeshtasticNodeCard extends HTMLElement {
           font-size: 18px;
           font-weight: 600;
           margin: 0 0 4px 0;
+          color: var(--primary-text-color);
         }
         .node-id {
           font-size: 12px;
-          color: #8b8d98;
+          color: var(--secondary-text-color);
           margin: 0;
         }
         .stats-grid {
@@ -110,7 +110,7 @@ class MeshtasticNodeCard extends HTMLElement {
         }
         .stat-label {
           font-size: 11px;
-          color: #8b8d98;
+          color: var(--secondary-text-color);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -120,6 +120,7 @@ class MeshtasticNodeCard extends HTMLElement {
           display: flex;
           align-items: center;
           gap: 6px;
+          color: var(--primary-text-color);
         }
         .battery-icon {
           font-size: 20px;
@@ -131,7 +132,7 @@ class MeshtasticNodeCard extends HTMLElement {
         }
         .signal-bar {
           width: 3px;
-          background: #4a9eff;
+          background: var(--primary-color);
           border-radius: 2px;
         }
         .details-section {
@@ -139,7 +140,7 @@ class MeshtasticNodeCard extends HTMLElement {
           flex-direction: column;
           gap: 8px;
           padding-top: 16px;
-          border-top: 1px solid #2a2d3e;
+          border-top: 1px solid var(--divider-color);
         }
         .detail-row {
           display: flex;
@@ -148,15 +149,15 @@ class MeshtasticNodeCard extends HTMLElement {
           font-size: 13px;
         }
         .detail-icon {
-          color: #8b8d98;
+          color: var(--secondary-text-color);
           font-size: 16px;
         }
         .detail-label {
-          color: #8b8d98;
+          color: var(--secondary-text-color);
           min-width: 60px;
         }
         .detail-value {
-          color: #fff;
+          color: var(--primary-text-color);
           font-weight: 500;
         }
       </style>
@@ -410,7 +411,7 @@ window.customCards.push({
 });
 
 console.info(
-  '%c MESHTASTIC-NODE-CARD %c v1.1.0 ',
+  '%c MESHTASTIC-NODE-CARD %c v1.2.0 ',
   'color: white; background: #667eea; font-weight: 700;',
   'color: #667eea; background: white; font-weight: 700;'
 );
