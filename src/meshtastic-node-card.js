@@ -397,3 +397,19 @@ class MeshtasticNodeCardEditor extends HTMLElement {
 }
 
 customElements.define('meshtastic-node-card-editor', MeshtasticNodeCardEditor);
+
+// Register the card with Home Assistant
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'meshtastic-node-card',
+  name: 'Meshtastic Node Card',
+  description: 'Display Meshtastic node information with battery, signal, and hardware details',
+  preview: false,
+  documentationURL: 'https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card',
+});
+
+console.info(
+  '%c MESHTASTIC-NODE-CARD %c v1.1.0 ',
+  'color: white; background: #667eea; font-weight: 700;',
+  'color: #667eea; background: white; font-weight: 700;'
+);
