@@ -17,7 +17,7 @@ jobs:
       - name: Create release zip
         run: |
           cd ${{ github.workspace }}
-          zip meshtastic-node-card.zip src/meshtastic-node-card.js
+          zip meshtastic-node-card.zip meshtastic-node-card.js
           
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
