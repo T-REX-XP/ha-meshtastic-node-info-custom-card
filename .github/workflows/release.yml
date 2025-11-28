@@ -16,7 +16,7 @@ jobs:
       
       - name: Create release zip
         run: |
-          cd ${{ github.workspace }}
+          cd ${{ github.workspace }}/src
           zip meshtastic-node-card.zip meshtastic-node-card.js
           
       - name: Upload release asset
