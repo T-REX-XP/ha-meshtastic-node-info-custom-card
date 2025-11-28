@@ -40,7 +40,20 @@
 5. Category: `Lovelace`
 6. Click "Add"
 7. Find "Meshtastic Node Card" and click "Install"
-8. Restart Home Assistant
+8. **Important:** Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+9. Restart Home Assistant
+
+**⚠️ Card not appearing?** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed help.
+
+#### Post-Installation Checklist
+
+After installing, verify these steps:
+
+- [ ] **Clear browser cache** - Hard refresh with Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)
+- [ ] **Restart Home Assistant** - Settings → System → Restart
+- [ ] **Check resource is added** - Settings → Dashboards → Resources → Look for `/hacsfiles/ha-meshtastic-node-info-custom-card/meshtastic-node-card.js`
+- [ ] **Check browser console** - Press F12, look for errors related to the card
+- [ ] **Verify file exists** - Check `/config/www/community/ha-meshtastic-node-info-custom-card/meshtastic-node-card.js`
 
 ### Manual Installation
 
