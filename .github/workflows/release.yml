@@ -14,15 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # - name: Create release zip
-      #   run: |
-      #     cd ${{ github.workspace }}
-      #     zip meshtastic-node-card.zip src/meshtastic-node-card.js
+      - name: Copy JS file to root for HACS
+        run: |
+          cp src/meshtastic-node-card.js meshtastic-node-card.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add meshtastic-node-card.js
+          git diff --staged --quiet || git commit -m "chore: sync distribution file for HACS"
+          git push
           
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
         with:
-          # files: meshtastic-node-card.zip
-          files: src/meshtastic-node-card.js
+          files: meshtastic-node-card.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
