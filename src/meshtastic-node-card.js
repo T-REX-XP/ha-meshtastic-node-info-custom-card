@@ -430,7 +430,7 @@ window.customCards.push({
   type: 'meshtastic-node-card',
   name: 'Meshtastic Node Card',
   description: 'Display Meshtastic node information with battery, signal, and hardware details',
-  preview: false,
+  preview: true,
   documentationURL: 'https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card',
 });
 
