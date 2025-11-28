@@ -1,0 +1,35 @@
+# Example Home Assistant Dashboard Configuration
+# Add this to your dashboard YAML or use the UI editor
+
+views:
+  - title: Meshtastic Nodes
+    path: meshtastic
+    cards:
+      # Single node card
+      - type: custom:meshtastic-node-card
+        entity: sensor.meshtastic_alphanode_1_base
+      
+      # Multiple nodes in a grid
+      - type: grid
+        columns: 2
+        cards:
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_node_1
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_node_2
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_node_3
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_node_4
+
+# Alternative: Sections View (Home Assistant 2024.x+)
+views:
+  - title: Meshtastic Network
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_base_station
+          - type: custom:meshtastic-node-card
+            entity: sensor.meshtastic_mobile_node

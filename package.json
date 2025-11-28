@@ -1,0 +1,29 @@
+{
+  "name": "meshtastic-node-card",
+  "version": "1.1.0",
+  "description": "A custom Home Assistant card for displaying Meshtastic node information",
+  "main": "meshtastic-node-card.js",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/T-REX-XP/ha-custom-card-meshtastik.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "hass",
+    "lovelace",
+    "custom-card",
+    "meshtastic",
+    "mesh-network",
+    "iot"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/T-REX-XP/ha-custom-card-meshtastik/issues"
+  },
+  "homepage": "https://github.com/T-REX-XP/ha-custom-card-meshtastik#readme"
+}

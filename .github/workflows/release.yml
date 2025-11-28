@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create release zip
+        run: |
+          cd ${{ github.workspace }}
+          zip meshtastic-node-card.zip src/meshtastic-node-card.js
+          
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./meshtastic-node-card.zip
+          asset_name: meshtastic-node-card.zip
+          asset_content_type: application/zip
