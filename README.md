@@ -2,6 +2,12 @@
 
 A custom card for Home Assistant to display Meshtastic node information with a beautiful, modern UI.
 
+## Screenshots
+
+![Meshtastic Node Card Example](docs/ui_example.png)
+
+*Example of the Meshtastic Node Card displaying node information with battery level, signal strength, and hardware details.*
+
 ## Features
 
 - 📱 Node name and ID display with avatar
@@ -91,10 +97,6 @@ The card expects the Meshtastic entity to have the following attributes:
 type: custom:meshtastic-node-card
 entity: sensor.meshtastic_alphanode_1_base
 ```
-
-## Screenshots
-
-See `docs/ui_example.png` for the card appearance.
 
 ## Support
 
