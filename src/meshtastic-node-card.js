@@ -1,110 +1,189 @@
 /**
  * Meshtastic Node Card
- * @version 1.3.1
+ * @version 1.4.0
  * @description A custom card for Home Assistant to display Meshtastic node information
  * @features Theme support, gateway device support, preview support, battery monitoring, signal strength, hardware info
- * @author Your Name
  * @license MIT
  */
 
 class MeshtasticNodeCard extends HTMLElement {
-  set hass(hass) {
-    // Store hass for later use
-    this._hass = hass;
-    
-    if (!this.content) {
-      const card = document.createElement('ha-card');
-      card.style.cssText = `
-        padding: 16px;
-      `;
-      
-      this.content = document.createElement('div');
-      card.appendChild(this.content);
-      this.appendChild(card);
+  constructor() {
+    super();
+    this._hass = null;
+    this.config = null;
+    this._card = null;
+    this._content = null;
+  }
+
+  /**
+   * Called by Home Assistant to supply configuration
+   * This must NOT be called by the card itself.
+   */
+  setConfig(config) {
+    if (!config || typeof config !== "object") {
+      throw new Error("Configuration error: config must be an object.");
     }
 
-    // Ensure config exists
+    // Allow empty entity (for preview); validate shape
+    this.config = {
+      entity: config.entity || null,
+    };
+
+    // Re-render if hass is already set
+    if (this._hass) {
+      this._updateContent();
+    }
+  }
+
+  /**
+   * Called by Home Assistant whenever hass changes.
+   */
+  set hass(hass) {
+    this._hass = hass;
+
+    if (!this._card) {
+      const card = document.createElement("ha-card");
+      card.style.cssText = "padding: 16px;";
+      const content = document.createElement("div");
+
+      card.appendChild(content);
+      this.appendChild(card);
+
+      this._card = card;
+      this._content = content;
+    }
+
+    this._updateContent();
+  }
+
+  /**
+   * Main render logic, called whenever hass or config changes.
+   */
+  _updateContent() {
+    if (!this._content || !this._hass) {
+      return;
+    }
+
+    // If config was never set, do nothing (HA contract: setConfig should be called)
     if (!this.config) {
-      this.config = {};
+      this._content.innerHTML = this._renderPlaceholder();
+      return;
     }
 
     const entityId = this.config.entity;
-    
-    console.log('Rendering card with entityId:', entityId, 'hass.states:', Object.keys(hass.states || {}).length);
-    
-    // Show preview placeholder if no entity configured
+
+    // Preview / unconfigured card
     if (!entityId) {
-      console.log('No entity configured, showing placeholder');
-      this.content.innerHTML = `
-        <div style="text-align: center; padding: 40px 20px; color: var(--secondary-text-color);">
-          <div style="font-size: 48px; margin-bottom: 16px;">📡</div>
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-text-color);">Meshtastic Node Card</div>
-          <div style="font-size: 14px;">Display Meshtastic node information with battery, signal, and hardware details</div>
-          <div style="margin-top: 16px; font-size: 12px; opacity: 0.7;">Select an entity to configure</div>
+      this._content.innerHTML = this._renderPlaceholder();
+      return;
+    }
+
+    const entity = this._hass.states[entityId];
+
+    if (!entity) {
+      this._content.innerHTML = `
+        <div style="color: var(--error-color);">
+          Entity "${entityId}" not found
         </div>
       `;
       return;
     }
-    
-    const entity = hass.states[entityId];
-    
-    console.log('Entity lookup result:', entity ? 'found' : 'not found', entityId);
-    
-    if (!entity) {
-      this.content.innerHTML = `<div style="color: var(--error-color);">Entity ${entityId} not found</div>`;
-      return;
-    }
 
-    const attrs = entity.attributes;
-    
+    this._content.innerHTML = this._renderEntity(entity);
+  }
+
+  /**
+   * Placeholder shown when no entity is configured.
+   */
+  _renderPlaceholder() {
+    return `
+      <div style="text-align: center; padding: 40px 20px; color: var(--secondary-text-color);">
+        <div style="font-size: 48px; margin-bottom: 16px;">📡</div>
+        <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-text-color);">
+          Meshtastic Node Card
+        </div>
+        <div style="font-size: 14px;">
+          Display Meshtastic node information with battery, signal, and hardware details
+        </div>
+        <div style="margin-top: 16px; font-size: 12px; opacity: 0.7;">
+          Select a Meshtastic entity in the card configuration
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Main entity renderer.
+   */
+  _renderEntity(entity) {
+    const attrs = entity.attributes || {};
+
     // Detect entity type: gateway device or node sensor
-    const isGateway = attrs.device_class === 'gateway';
-    
+    const isGateway = attrs.device_class === "gateway";
+
     // Extract node name and ID
-    const nodeName = attrs.friendly_name || attrs.long_name || attrs.short_name || 'Unknown Node';
-    const nodeId = attrs.node_id || entity.entity_id.split('.')[1] || entity.state;
-    
-    // Extract data with fallbacks for both formats
-    const battery = attrs.battery_level || 0;
-    const voltage = attrs.voltage || 0;
-    const signal = attrs.snr || attrs.rssi || 0;
-    const snr = attrs.snr || 0;
-    const lastSeen = attrs.last_heard || entity.last_changed;
-    
+    const nodeName =
+      attrs.friendly_name ||
+      attrs.long_name ||
+      attrs.short_name ||
+      "Unknown Node";
+
+    const nodeId =
+      attrs.node_id ||
+      (typeof entity.entity_id === "string"
+        ? entity.entity_id.split(".")[1]
+        : "") ||
+      entity.state ||
+      "unknown";
+
+    // Extract data with fallbacks
+    const battery = Number(attrs.battery_level ?? 0) || 0;
+    const voltage = Number(attrs.voltage ?? 0) || 0;
+    const signal = Number(attrs.snr ?? attrs.rssi ?? 0) || 0;
+    const snr = Number(attrs.snr ?? 0) || 0;
+    const lastSeen = attrs.last_heard || entity.last_changed || null;
+
     // Hardware info - gateway shows config, sensors show hardware model
-    const hardware = isGateway 
-      ? `${attrs.config_lora_region || 'Unknown'} / ${attrs.config_lora_modemPreset || 'Unknown'}`
-      : (attrs.hardware || 'Unknown');
-    
+    const hardware = isGateway
+      ? `${attrs.config_lora_region || "Unknown"} / ${
+          attrs.config_lora_modemPreset || "Unknown"
+        }`
+      : attrs.hardware || "Unknown";
+
     // Location - check GPS settings for gateway
     const location = isGateway
-      ? (attrs.config_position_gpsEnabled ? 'GPS Enabled' : 'GPS Disabled')
-      : (attrs.position_precision_bits ? 'GPS Available' : attrs.location || 'Unknown');
-    
-    // Message counts - not available for gateway, show config instead
+      ? attrs.config_position_gpsEnabled
+        ? "GPS Enabled"
+        : "GPS Disabled"
+      : attrs.position_precision_bits
+      ? "GPS Available"
+      : attrs.location || "Unknown";
+
+    // Message counts / config summary
     const counts = isGateway
       ? {
           hopLimit: attrs.config_lora_hopLimit || 0,
           txPower: attrs.config_lora_txPower || 0,
-          role: attrs.config_device_role || 'Unknown'
+          role: attrs.config_device_role || "Unknown",
         }
       : {
           total: attrs.message_count || 0,
           sent: attrs.messages_sent || 0,
-          received: attrs.messages_received || 0
+          received: attrs.messages_received || 0,
         };
 
-    // Format last seen
+    // Format derived values
     const lastSeenTime = this.formatLastSeen(lastSeen);
-    
-    // Battery icon and color
     const batteryIcon = this.getBatteryIcon(battery);
-    const batteryColor = battery > 50 ? '#00ff88' : battery > 20 ? '#ffaa00' : '#ff5555';
-    
-    // Signal bars
+    const batteryColor =
+      battery > 50 ? "#00ff88" : battery > 20 ? "#ffaa00" : "#ff5555";
+
     const signalBars = this.getSignalBars(signal);
 
-    this.content.innerHTML = `
+    const safeVoltage = voltage.toFixed ? voltage.toFixed(1) : voltage;
+    const safeSnr = snr.toFixed ? snr.toFixed(1) : snr;
+
+    return `
       <style>
         .meshtastic-card {
           display: flex;
@@ -209,7 +288,7 @@ class MeshtasticNodeCard extends HTMLElement {
           font-weight: 500;
         }
       </style>
-      
+
       <div class="meshtastic-card">
         <div class="node-header">
           <div class="node-avatar">${this.getInitials(nodeName)}</div>
@@ -218,31 +297,31 @@ class MeshtasticNodeCard extends HTMLElement {
             <p class="node-id">${nodeId}</p>
           </div>
         </div>
-        
+
         <div class="stats-grid">
           <div class="stat-item">
             <div class="stat-label">Battery</div>
             <div class="stat-value">
               <span class="battery-icon" style="color: ${batteryColor};">${batteryIcon}</span>
-              <span style="color: ${batteryColor};">${battery}% (${voltage.toFixed(1)}V)</span>
+              <span style="color: ${batteryColor};">${battery}% (${safeVoltage}V)</span>
             </div>
           </div>
-          
+
           <div class="stat-item">
             <div class="stat-label">Signal</div>
             <div class="stat-value">
               <div class="signal-bars">${signalBars}</div>
-              <span>${signal}dBm</span>
+              <span>${signal} dBm</span>
             </div>
           </div>
-          
+
           <div class="stat-item">
             <div class="stat-label">SNR</div>
             <div class="stat-value">
-              <span style="color: #00ff88;">${snr.toFixed(1)} dB</span>
+              <span style="color: #00ff88;">${safeSnr} dB</span>
             </div>
           </div>
-          
+
           <div class="stat-item">
             <div class="stat-label">Last Seen</div>
             <div class="stat-value">
@@ -250,7 +329,7 @@ class MeshtasticNodeCard extends HTMLElement {
             </div>
           </div>
         </div>
-        
+
         <div class="details-section">
           <div class="detail-row">
             <span class="detail-icon">📡</span>
@@ -263,35 +342,19 @@ class MeshtasticNodeCard extends HTMLElement {
             <span class="detail-value">${location}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-icon">${isGateway ? '⚙️' : '💬'}</span>
-            <span class="detail-label">${isGateway ? 'Config:' : 'Counts:'}</span>
-            <span class="detail-value">${isGateway 
-              ? `${counts.role} | Hop:${counts.hopLimit} | TX:${counts.txPower}dBm`
-              : `${counts.total} | ↑${counts.sent} | ↓${counts.received}`
-            }</span>
+            <span class="detail-icon">${isGateway ? "⚙️" : "💬"}</span>
+            <span class="detail-label">${isGateway ? "Config:" : "Counts:"}</span>
+            <span class="detail-value">
+              ${
+                isGateway
+                  ? `${counts.role} | Hop:${counts.hopLimit} | TX:${counts.txPower} dBm`
+                  : `${counts.total} | ↑${counts.sent} | ↓${counts.received}`
+              }
+            </span>
           </div>
         </div>
       </div>
     `;
-  }
-
-  setConfig(config) {
-    // Store the old config before updating
-    const oldConfig = this.config || {};
-    
-    // Set the new config (allow empty entity for preview mode)
-    this.config = config || {};
-    
-    console.log('setConfig called:', config, 'oldConfig:', oldConfig);
-    
-    // Trigger re-render if config changed and hass is set (for live preview)
-    if (this._hass) {
-      console.log('Re-rendering with entity:', config?.entity);
-      // Re-render the card with new config by calling hass setter
-      const tempHass = this._hass;
-      this._hass = null;
-      this.hass = tempHass;
-    }
   }
 
   getCardSize() {
@@ -303,40 +366,36 @@ class MeshtasticNodeCard extends HTMLElement {
       rows: 4,
       columns: 6,
       min_rows: 4,
-      max_rows: 6
+      max_rows: 6,
     };
   }
 
-  // UI Configuration Editor Support
-  static getConfigElement() {
-    return document.createElement('meshtastic-node-card-editor');
-  }
-
-  static getStubConfig() {
-    return {
-      entity: ''
-    };
-  }
+  // --- Helpers -------------------------------------------------------------
 
   getInitials(name) {
+    if (!name || typeof name !== "string") {
+      return "??";
+    }
     return name
       .split(/[\s-]/)
-      .map(word => word[0])
-      .join('')
+      .filter((w) => w.length > 0)
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .substring(0, 2);
   }
 
   getBatteryIcon(level) {
-    if (level > 75) return '🔋';
-    if (level > 50) return '🔋';
-    if (level > 25) return '🪫';
-    return '🪫';
+    if (level > 75) return "🔋";
+    if (level > 50) return "🔋";
+    if (level > 25) return "🪫";
+    return "🪫";
   }
 
   getSignalBars(signal) {
+    // crude mapping: better than nothing
     const strength = signal > -70 ? 4 : signal > -80 ? 3 : signal > -90 ? 2 : 1;
-    let bars = '';
+    let bars = "";
     for (let i = 1; i <= 4; i++) {
       const height = i * 4;
       const opacity = i <= strength ? 1 : 0.3;
@@ -346,48 +405,81 @@ class MeshtasticNodeCard extends HTMLElement {
   }
 
   formatLastSeen(timestamp) {
-    if (!timestamp) return 'Unknown';
-    
+    if (!timestamp) return "Unknown";
+
     const now = new Date();
     const then = new Date(timestamp);
-    const diffMs = now - then;
+    if (Number.isNaN(then.getTime())) {
+      return "Unknown";
+    }
+
+    const diffMs = Math.max(0, now - then);
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'Just now';
+
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   }
+
+  // UI Configuration Editor Support
+  static getConfigElement() {
+    return document.createElement("meshtastic-node-card-editor");
+  }
+
+  static getStubConfig() {
+    return {
+      entity: "",
+    };
+  }
 }
 
-customElements.define('meshtastic-node-card', MeshtasticNodeCard);
+customElements.define("meshtastic-node-card", MeshtasticNodeCard);
 
-// Configuration Editor Element
+/**
+ * Configuration editor for the Meshtastic Node Card
+ */
 class MeshtasticNodeCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this._config = {};
+    this._hass = null;
+    this.attachShadow({ mode: "open" });
+
+    this._onValueChanged = this._onValueChanged.bind(this);
+  }
+
   setConfig(config) {
-    this._config = config;
-    this.render();
+    this._config = {
+      entity: config.entity || "",
+    };
+    this._render();
   }
 
-  configChanged(newConfig) {
-    const event = new Event('config-changed', {
-      bubbles: true,
-      composed: true,
-    });
-    event.detail = { config: newConfig };
-    this.dispatchEvent(event);
+  set hass(hass) {
+    this._hass = hass;
+    this._render();
   }
 
-  render() {
-    if (!this._config) {
-      return;
-    }
+  /**
+   * Required for HA editor registry
+   */
+  get value() {
+    return this._config;
+  }
 
-    this.innerHTML = `
+  /**
+   * Render the editor UI into shadow DOM
+   */
+  _render() {
+    const root = this.shadowRoot;
+    if (!root) return;
+
+    root.innerHTML = `
       <style>
         .card-config {
           padding: 16px;
@@ -417,11 +509,6 @@ class MeshtasticNodeCardEditor extends HTMLElement {
           <label for="entity">Entity (Required)</label>
           <ha-entity-picker
             id="entity"
-            .hass=${this._hass}
-            .value=${this._config.entity || ''}
-            .configValue=${'entity'}
-            @value-changed=${this._valueChanged}
-            .includeDomains=${['meshtastic']}
             allow-custom-entity
           ></ha-entity-picker>
         </div>
@@ -430,51 +517,61 @@ class MeshtasticNodeCardEditor extends HTMLElement {
         </div>
       </div>
     `;
+
+    const picker = root.getElementById("entity");
+    if (!picker) return;
+
+    picker.hass = this._hass;
+    picker.value = this._config.entity || "";
+    picker.includeDomains = ["meshtastic"];
+    picker.configValue = "entity";
+
+    picker.removeEventListener("value-changed", this._onValueChanged);
+    picker.addEventListener("value-changed", this._onValueChanged);
   }
 
-  set hass(hass) {
-    this._hass = hass;
-    // Update entity picker if it exists
-    const entityPicker = this.querySelector('ha-entity-picker');
-    if (entityPicker) {
-      entityPicker.hass = hass;
-    }
-  }
+  _onValueChanged(ev) {
+    if (!this._config) return;
 
-  _valueChanged(ev) {
-    if (!this._config || !this._hass) {
-      return;
-    }
     const target = ev.target;
-    const configValue = target.configValue;
-    
-    if (this._config[configValue] === target.value) {
+    const key = target.configValue || "entity";
+    const value = target.value;
+
+    if (this._config[key] === value) {
       return;
     }
-    
-    const newConfig = {
+
+    this._config = {
       ...this._config,
-      [configValue]: target.value,
+      [key]: value,
     };
-    
-    this.configChanged(newConfig);
+
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        detail: { config: this._config },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 
-customElements.define('meshtastic-node-card-editor', MeshtasticNodeCardEditor);
+customElements.define("meshtastic-node-card-editor", MeshtasticNodeCardEditor);
 
 // Register the card with Home Assistant
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'meshtastic-node-card',
-  name: 'Meshtastic Node Card',
-  description: 'Display Meshtastic node information with battery, signal, and hardware details',
+  type: "meshtastic-node-card",
+  name: "Meshtastic Node Card",
+  description:
+    "Display Meshtastic node information with battery, signal, and hardware details",
   preview: true,
-  documentationURL: 'https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card',
+  documentationURL:
+    "https://github.com/T-REX-XP/ha-meshtastic-node-info-custom-card",
 });
 
 console.info(
-  '%c MESHTASTIC-NODE-CARD %c v1.3.1 ',
-  'color: white; background: #667eea; font-weight: 700;',
-  'color: #667eea; background: white; font-weight: 700;'
+  "%c MESHTASTIC-NODE-CARD %c v1.4.0 ",
+  "color: white; background: #667eea; font-weight: 700;",
+  "color: #667eea; background: white; font-weight: 700;"
 );
